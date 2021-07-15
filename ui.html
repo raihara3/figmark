@@ -1,17 +1,29 @@
-<h2>figmark</h2>
-<p>Count: <input id="count" value="5"></p>
-<button id="create">Create</button>
-<button id="cancel">Cancel</button>
+<button id="add">+mark</button>
+<ul id="figmark-list"></ul>
 <script>
 
-document.getElementById('create').onclick = () => {
-  const textbox = document.getElementById('count');
-  const count = parseInt(textbox.value, 10);
-  parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*')
+document.getElementById("add").onclick = () => {
+  parent.postMessage({ pluginMessage: { type: "add-bookmark" } }, "*")
 }
 
-document.getElementById('cancel').onclick = () => {
-  parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
+const findNode = (element) => {
+  const id = element.dataset.id
+  parent.postMessage({ pluginMessage: { type: "select-node", id: id } }, "*")
+}
+
+onmessage = (event) => {
+  const data = event.data.pluginMessage
+  if(data.type === "update-figmark") {
+    const listWrapper = document.getElementById("figmark-list")
+    listWrapper.innerHTML = ""
+    data.value.forEach(v => {
+      const li = document.createElement("li")
+      li.dataset.id = v.id
+      li.innerText = v.name
+      li.onclick = (() => findNode(li))
+      listWrapper.appendChild(li)
+    });
+  }
 }
 
 </script>
