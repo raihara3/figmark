@@ -17,14 +17,19 @@ onmessage = (event) => {
     const listWrapper = document.getElementById("figmark-list")
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
-      // TODO: コンポーネントの選択と遷移、２種類ボタンを用意する
       // TODO: aタグでコンポーネントに遷移できるようにする
       // TODO: 削除ボタンを用意する
       // TODO: コンポーネント名を任意のものに変更できるようにする
+
+      const selectButton = document.createElement("button")
+      selectButton.innerText = "select"
+      selectButton.onclick = (() => findNode(li))
+
       const li = document.createElement("li")
       li.dataset.id = v.id
       li.innerText = v.name
-      li.onclick = (() => findNode(li))
+
+      li.appendChild(selectButton)
       listWrapper.appendChild(li)
     });
   }
