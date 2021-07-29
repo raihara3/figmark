@@ -11,6 +11,13 @@ const findNode = (element) => {
   parent.postMessage({ pluginMessage: { type: "select-node", id: id } }, "*")
 }
 
+const jumpNode = (element) => {
+  const id = element.dataset.id
+  console.log(window)
+  parent.postMessage({ pluginMessage: { type: "jump-node", id: id } }, "*")
+  // TODO: ページ遷移、windowにアクセスできないので別の方法を検討する
+}
+
 onmessage = (event) => {
   const data = event.data.pluginMessage
   if(data.type === "update-figmark") {
@@ -20,16 +27,21 @@ onmessage = (event) => {
       // TODO: aタグでコンポーネントに遷移できるようにする
       // TODO: 削除ボタンを用意する
       // TODO: コンポーネント名を任意のものに変更できるようにする
-
-      const selectButton = document.createElement("button")
-      selectButton.innerText = "select"
-      selectButton.onclick = (() => findNode(li))
-
       const li = document.createElement("li")
       li.dataset.id = v.id
       li.innerText = v.name
 
+      const button = document.createElement("button")
+      const selectButton = button.cloneNode(true)
+      selectButton.innerText = "select"
+      selectButton.onclick = (() => findNode(li))
       li.appendChild(selectButton)
+
+      const jumpButton = button.cloneNode(true)
+      jumpButton.innerText = "jump"
+      jumpButton.onclick = (() => jumpNode(li))
+      li.appendChild(jumpButton)
+
       listWrapper.appendChild(li)
     });
   }
