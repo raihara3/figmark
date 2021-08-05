@@ -22,8 +22,6 @@ figma.ui.onmessage = msg => {
   }else if(msg.type === "select-node") {
     const node = figma.getNodeById(msg.id)
     figma.currentPage.selection = new Array().concat(node)
-  }else if(msg.type === "jump-node") {
-    console.log(window)
   }
 }
 
