@@ -20,6 +20,15 @@ figma.ui.onmessage = msg => {
         const node = figma.getNodeById(msg.id);
         figma.currentPage.selection = new Array().concat(node);
     }
+    else if (msg.type === "delete-bookmark") {
+        figmark = figmark.map(v => {
+            if (v.id !== msg.id)
+                return v;
+            return;
+        }).filter(v => v !== undefined);
+        figma.clientStorage.setAsync("figmark", figmark);
+        figma.ui.postMessage({ type: "update-figmark", value: figmark });
+    }
 };
 figma.clientStorage.getAsync("figmark").then(value => {
     if (value !== undefined) {

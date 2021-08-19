@@ -11,13 +11,18 @@ const findNode = (element) => {
   parent.postMessage({ pluginMessage: { type: "select-node", id: id } }, "*")
 }
 
+const deleteMark = (element) => {
+  const id = element.dataset.id
+  parent.postMessage({ pluginMessage: { type: "delete-bookmark", id: id } }, "*")
+}
+
 onmessage = (event) => {
   const data = event.data.pluginMessage
   if(data.type === "update-figmark") {
     const listWrapper = document.getElementById("figmark-list")
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
-      // TODO: 削除ボタンを用意する
+      // TODO: ページを跨いだブックマーク・選択
       // TODO: コンポーネント名を任意のものに変更できるようにする
       const li = document.createElement("li")
       li.dataset.id = v.id
@@ -28,6 +33,11 @@ onmessage = (event) => {
       selectButton.innerText = "select"
       selectButton.onclick = (() => findNode(li))
       li.appendChild(selectButton)
+
+      const deleteButton = button.cloneNode(true)
+      deleteButton.innerText = "delete"
+      deleteButton.onclick = (() => deleteMark(li))
+      li.appendChild(deleteButton)
 
       listWrapper.appendChild(li)
     });
