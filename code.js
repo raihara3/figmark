@@ -2,7 +2,6 @@ let figmark = [];
 figma.showUI(__html__);
 figma.ui.onmessage = msg => {
     if (msg.type === "add-bookmark") {
-        // TODO: 複数選択してたら全部追加できるようにする
         const select = figma.currentPage.selection;
         const isSaved = figmark.map(v => v.id).filter(id => id === select[0].id);
         if (isSaved.length > 0) {

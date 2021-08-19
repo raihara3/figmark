@@ -42,6 +42,9 @@ onmessage = (event) => {
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
       // TODO: ページを跨いだブックマーク・選択
+      // TODO: 複数選択してたら全部追加できるようにする
+      // TODO: 選択したものにフォーカスをあてる
+      // TODO: スタイルをあてる
 
       const input = document.createElement("input")
       input.readOnly = true
