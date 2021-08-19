@@ -29,6 +29,16 @@ figma.ui.onmessage = msg => {
         figma.clientStorage.setAsync("figmark", figmark);
         figma.ui.postMessage({ type: "update-figmark", value: figmark });
     }
+    else if (msg.type === "update-bookmark") {
+        figmark = figmark.map(v => {
+            if (v.id === msg.id) {
+                return { id: v.id, name: msg.value };
+            }
+            return v;
+        });
+        figma.clientStorage.setAsync("figmark", figmark);
+        figma.ui.postMessage({ type: "update-figmark", value: figmark });
+    }
 };
 figma.clientStorage.getAsync("figmark").then(value => {
     if (value !== undefined) {

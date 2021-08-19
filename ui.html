@@ -1,20 +1,39 @@
+<style>
+  input[type=text]:read-only {
+    border: none;
+    pointer-events: none;
+  }
+</style>
+
 <button id="add">+mark</button>
 <ul id="figmark-list"></ul>
+
 <script>
 
+// ブックマークの追加
 document.getElementById("add").onclick = () => {
   parent.postMessage({ pluginMessage: { type: "add-bookmark" } }, "*")
 }
 
-const findNode = (element) => {
-  const id = element.dataset.id
+// ブックマークしたコンポーネントを選択
+const findNode = (id) => {
   parent.postMessage({ pluginMessage: { type: "select-node", id: id } }, "*")
 }
 
-const deleteMark = (element) => {
-  const id = element.dataset.id
+// ブックマークから削除
+const deleteMark = (id) => {
   parent.postMessage({ pluginMessage: { type: "delete-bookmark", id: id } }, "*")
 }
+
+// ブックマーク情報の更新
+const updateMark = (id, value) => {
+  parent.postMessage({ pluginMessage: { type: "update-bookmark", id: id, value: value} }, "*")
+}
+
+
+/* =====================================
+  ここからDOMとイベントの生成
+===================================== */
 
 onmessage = (event) => {
   const data = event.data.pluginMessage
@@ -23,21 +42,44 @@ onmessage = (event) => {
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
       // TODO: ページを跨いだブックマーク・選択
-      // TODO: コンポーネント名を任意のものに変更できるようにする
-      const li = document.createElement("li")
-      li.dataset.id = v.id
-      li.innerText = v.name
 
+      const input = document.createElement("input")
+      input.readOnly = true
+      input.type = "text"
+      input.value = v.name
+      input.addEventListener("blur", (e) => {
+        input.readOnly = true
+        updateMark(v.id, e.target.value)
+      })
+
+      const li = document.createElement("li")
+      li.id = `item_${v.id}`
+      li.dataset.id = v.id
+      li.appendChild(input)
+
+      // selectボタン
       const button = document.createElement("button")
       const selectButton = button.cloneNode(true)
       selectButton.innerText = "select"
-      selectButton.onclick = (() => findNode(li))
+      selectButton.onclick = (() => findNode(v.id))
       li.appendChild(selectButton)
 
+      // deleteボタン
       const deleteButton = button.cloneNode(true)
       deleteButton.innerText = "delete"
-      deleteButton.onclick = (() => deleteMark(li))
+      deleteButton.onclick = (() => deleteMark(v.id))
       li.appendChild(deleteButton)
+
+      // editボタン
+      const editButton = button.cloneNode(true)
+      editButton.innerText = "edit"
+      editButton.onclick = (() => {
+        const item = document.getElementById(`item_${v.id}`)
+        const input = item.querySelector("input")
+        input.readOnly = false
+        input.focus()
+      })
+      li.appendChild(editButton)
 
       listWrapper.appendChild(li)
     });

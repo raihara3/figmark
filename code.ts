@@ -19,14 +19,26 @@ figma.ui.onmessage = msg => {
     })
     figma.clientStorage.setAsync("figmark", figmark)
     figma.ui.postMessage({ type: "update-figmark", value: figmark })
+
   }else if(msg.type === "select-node") {
     const node = figma.getNodeById(msg.id)
     figma.currentPage.selection = new Array().concat(node)
+
   }else if(msg.type === "delete-bookmark") {
     figmark = figmark.map(v => {
       if(v.id !== msg.id) return v
       return
     }).filter(v => v !== undefined)
+    figma.clientStorage.setAsync("figmark", figmark)
+    figma.ui.postMessage({ type: "update-figmark", value: figmark })
+
+  }else if(msg.type === "update-bookmark") {
+    figmark = figmark.map(v => {
+      if(v.id === msg.id) {
+        return {id: v.id, name: msg.value}
+      }
+      return v
+    })
     figma.clientStorage.setAsync("figmark", figmark)
     figma.ui.postMessage({ type: "update-figmark", value: figmark })
   }
