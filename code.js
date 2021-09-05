@@ -3,6 +3,8 @@ figma.showUI(__html__);
 figma.ui.onmessage = msg => {
     if (msg.type === "add-bookmark") {
         const select = figma.currentPage.selection;
+        if (select.length === 0)
+            return;
         const isSaved = figmark.map(v => v.id).filter(id => id === select[0].id);
         if (isSaved.length > 0) {
             console.log("既に保存済み");
@@ -18,6 +20,7 @@ figma.ui.onmessage = msg => {
     else if (msg.type === "select-node") {
         const node = figma.getNodeById(msg.id);
         figma.currentPage.selection = new Array().concat(node);
+        // console.log(new Array().concat(figma.currentPage))
     }
     else if (msg.type === "delete-bookmark") {
         figmark = figmark.map(v => {
