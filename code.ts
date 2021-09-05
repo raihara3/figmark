@@ -1,4 +1,10 @@
-let figmark = []
+interface FigmarkStorage {
+  id: string
+  page: string
+  name: string
+}
+
+let figmark: FigmarkStorage[] = []
 
 figma.showUI(__html__)
 
@@ -15,15 +21,22 @@ figma.ui.onmessage = msg => {
 
     figmark.push({
       id: select[0].id,
+      page: figma.currentPage.id,
       name: select[0].name
     })
     figma.clientStorage.setAsync("figmark", figmark)
     figma.ui.postMessage({ type: "update-figmark", value: figmark })
 
   }else if(msg.type === "select-node") {
+    // select page
+    if(figma.currentPage.id !== msg.page) {
+      const targetPage = figma.root.findChild(v => v.id === msg.page)
+      figma.currentPage = targetPage
+    }
+
+    // select component
     const node = figma.getNodeById(msg.id)
     figma.currentPage.selection = new Array().concat(node)
-    // console.log(new Array().concat(figma.currentPage))
 
   }else if(msg.type === "delete-bookmark") {
     figmark = figmark.map(v => {
@@ -36,7 +49,11 @@ figma.ui.onmessage = msg => {
   }else if(msg.type === "update-bookmark") {
     figmark = figmark.map(v => {
       if(v.id === msg.id) {
-        return {id: v.id, name: msg.value}
+        return {
+          id: v.id,
+          page: v.page,
+          name: msg.value
+        }
       }
       return v
     })

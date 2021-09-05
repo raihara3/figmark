@@ -16,8 +16,8 @@ document.getElementById("add").onclick = () => {
 }
 
 // ブックマークしたコンポーネントを選択
-const findNode = (id) => {
-  parent.postMessage({ pluginMessage: { type: "select-node", id: id } }, "*")
+const findNode = (id, page) => {
+  parent.postMessage({ pluginMessage: { type: "select-node", id: id, page: page } }, "*")
 }
 
 // ブックマークから削除
@@ -41,7 +41,6 @@ onmessage = (event) => {
     const listWrapper = document.getElementById("figmark-list")
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
-      // TODO: ページを跨いだブックマーク・選択
       // TODO: 複数選択してたら全部追加できるようにする
       // TODO: 選択したものにフォーカスをあてる
       // TODO: スタイルをあてる
@@ -58,13 +57,14 @@ onmessage = (event) => {
       const li = document.createElement("li")
       li.id = `item_${v.id}`
       li.dataset.id = v.id
+      li.dataset.page = v.page
       li.appendChild(input)
 
       // selectボタン
       const button = document.createElement("button")
       const selectButton = button.cloneNode(true)
       selectButton.innerText = "select"
-      selectButton.onclick = (() => findNode(v.id))
+      selectButton.onclick = (() => findNode(v.id, v.page))
       li.appendChild(selectButton)
 
       // deleteボタン
