@@ -2,18 +2,20 @@ let figmark = [];
 figma.showUI(__html__);
 figma.ui.onmessage = msg => {
     if (msg.type === "add-bookmark") {
-        const select = figma.currentPage.selection;
-        if (select.length === 0)
+        const selections = figma.currentPage.selection;
+        // 選択されているコンポーネントがない
+        if (selections.length === 0)
             return;
-        const isSaved = figmark.map(v => v.id).filter(id => id === select[0].id);
-        if (isSaved.length > 0) {
-            console.log("既に保存済み");
-            return;
-        }
-        figmark.push({
-            id: select[0].id,
-            page: figma.currentPage.id,
-            name: select[0].name
+        selections.forEach(select => {
+            const isSaved = figmark.map(v => v.id).filter(id => id === select.id);
+            // 既に保存されている
+            if (isSaved.length > 0)
+                return;
+            figmark.push({
+                id: select.id,
+                page: figma.currentPage.id,
+                name: select.name
+            });
         });
         figma.clientStorage.setAsync("figmark", figmark);
         figma.ui.postMessage({ type: "update-figmark", value: figmark });
