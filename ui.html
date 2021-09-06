@@ -49,14 +49,14 @@
   li div {
     flex-grow: 1;
     padding: 6px 0 6px 10px;
-    font-size: 12px;
+    font-size: 11px;
     cursor: default;
   }
 
   li button {
     display: none;
-    width: 32px;
-    height: 30px;
+    width: 30px;
+    height: 28px;
     padding: 0;
     border-radius: 3px;
   }
@@ -116,6 +116,8 @@ onmessage = (event) => {
       // TODO: 選択したものにフォーカスをあてる
       // TODO: 保存名に文字数制限を設ける
       // TODO: 全削除ボタン
+      // TODO: 保存名変更時にテキスト全選択する
+      // TODO: プラスアイコンの差し替え
 
       const div = document.createElement("div")
       div.contentEditable = false
