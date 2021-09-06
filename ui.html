@@ -1,17 +1,50 @@
 <style>
+  body {
+    margin: 0;
+  }
+
+  input {
+    width: 80%;
+  }
   input[type=text]:read-only {
     border: none;
     pointer-events: none;
   }
 
+  button {
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+
   ul {
     padding: 0;
+    border-top: solid 1px #E7E7E7;
   }
 
   li {
-    padding: 8px 0;
-    border-top: solid 1px #E7E7E7;
+    display: flex;
+    padding: 4px 8px;
   }
+    li:hover {
+      outline: 1px solid #00A1FF;
+      outline-offset: -1px;
+    }
+
+  li button {
+    width: 32px;
+    height: 30px;
+    padding: 0;
+    border-radius: 3px;
+  }
+    li button:hover {
+      background: #EEEEEE;
+    }
+    li button svg {
+      width: 16px;
+      height: 16px;
+      fill: #2F2F2F;
+    }
 </style>
 
 <button id="add">
@@ -33,7 +66,10 @@ const findNode = (id, page) => {
 
 // ブックマークから削除
 const deleteMark = (id) => {
-  parent.postMessage({ pluginMessage: { type: "delete-bookmark", id: id } }, "*")
+  const result = confirm("削除していいですか？");
+  if(result) {
+    parent.postMessage({ pluginMessage: { type: "delete-bookmark", id: id } }, "*")
+  }
 }
 
 // ブックマーク情報の更新
