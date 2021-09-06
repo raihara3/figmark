@@ -45,6 +45,7 @@ onmessage = (event) => {
       // TODO: 選択したものにフォーカスをあてる
       // TODO: スタイルをあてる
 
+      // input
       const input = document.createElement("input")
       input.readOnly = true
       input.type = "text"
@@ -56,8 +57,6 @@ onmessage = (event) => {
 
       const li = document.createElement("li")
       li.id = `item_${v.id}`
-      li.dataset.id = v.id
-      li.dataset.page = v.page
       li.appendChild(input)
 
       // selectボタン
