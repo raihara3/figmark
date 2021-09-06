@@ -3,9 +3,20 @@
     border: none;
     pointer-events: none;
   }
+
+  ul {
+    padding: 0;
+  }
+
+  li {
+    padding: 8px 0;
+    border-top: solid 1px #E7E7E7;
+  }
 </style>
 
-<button id="add">+mark</button>
+<button id="add">
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+</button>
 <ul id="figmark-list"></ul>
 
 <script>
@@ -61,19 +72,17 @@ onmessage = (event) => {
       // selectボタン
       const button = document.createElement("button")
       const selectButton = button.cloneNode(true)
-      selectButton.innerText = "select"
+      selectButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z"/></svg>
+      `
       selectButton.onclick = (() => findNode(v.id, v.page))
       li.appendChild(selectButton)
 
-      // deleteボタン
-      const deleteButton = button.cloneNode(true)
-      deleteButton.innerText = "delete"
-      deleteButton.onclick = (() => deleteMark(v.id))
-      li.appendChild(deleteButton)
-
       // editボタン
       const editButton = button.cloneNode(true)
-      editButton.innerText = "edit"
+      editButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"/></svg>
+      `
       editButton.onclick = (() => {
         const item = document.getElementById(`item_${v.id}`)
         const input = item.querySelector("input")
@@ -81,6 +90,14 @@ onmessage = (event) => {
         input.focus()
       })
       li.appendChild(editButton)
+
+      // deleteボタン
+      const deleteButton = button.cloneNode(true)
+      deleteButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
+      `
+      deleteButton.onclick = (() => deleteMark(v.id))
+      li.appendChild(deleteButton)
 
       listWrapper.appendChild(li)
     });
