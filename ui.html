@@ -3,9 +3,6 @@
     margin: 0;
   }
 
-  input {
-    width: 80%;
-  }
   input[type=text]:read-only {
     border: none;
     pointer-events: none;
@@ -17,28 +14,54 @@
     background: none;
   }
 
+  header {
+    background: #2C2C2C;
+  }
+
+  .add-button {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    color: #FFFFFF;
+  }
+    .add-button:hover {
+      background: #000000;
+    }
+    .add-button svg {
+      fill: #FFFFFF;
+    }
+
   ul {
+    margin: auto;
     padding: 0;
-    border-top: solid 1px #E7E7E7;
   }
 
   li {
     display: flex;
-    padding: 4px 8px;
+    align-items: center;
+    padding: 2px 0 2px;
   }
     li:hover {
       outline: 1px solid #00A1FF;
       outline-offset: -1px;
     }
 
+  li div {
+    flex-grow: 1;
+    padding: 6px 0 6px 10px;
+    font-size: 12px;
+    cursor: default;
+  }
+
   li button {
+    display: none;
     width: 32px;
     height: 30px;
     padding: 0;
     border-radius: 3px;
   }
-    li button:hover {
-      background: #EEEEEE;
+    li:hover > button {
+      display: inline-block;
     }
     li button svg {
       width: 16px;
@@ -47,15 +70,17 @@
     }
 </style>
 
-<button id="add">
-  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-</button>
+<header>
+  <button id="add-button" class="add-button">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+  </button>
+</header>
 <ul id="figmark-list"></ul>
 
 <script>
 
 // ブックマークの追加
-document.getElementById("add").onclick = () => {
+document.getElementById("add-button").onclick = () => {
   parent.postMessage({ pluginMessage: { type: "add-bookmark" } }, "*")
 }
 
@@ -89,46 +114,33 @@ onmessage = (event) => {
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
       // TODO: 選択したものにフォーカスをあてる
-      // TODO: スタイルをあてる
+      // TODO: 保存名に文字数制限を設ける
+      // TODO: 全削除ボタン
 
-      // input
-      const input = document.createElement("input")
-      input.readOnly = true
-      input.type = "text"
-      input.value = v.name
-      input.addEventListener("blur", (e) => {
-        input.readOnly = true
-        updateMark(v.id, e.target.value)
+      const div = document.createElement("div")
+      div.contentEditable = false
+      div.innerText = v.name
+      div.addEventListener("click", (e) => {
+        // コンポーネントを選択
+        findNode(v.id, v.page)
+      })
+      div.addEventListener("dblclick", (e) => {
+        // 保存名の変更
+        div.contentEditable = true
+        div.focus()
+      })
+      div.addEventListener("blur", (e) => {
+        // storageを更新
+        div.contentEditable = false
+        updateMark(v.id, e.target.innerText)
       })
 
       const li = document.createElement("li")
       li.id = `item_${v.id}`
-      li.appendChild(input)
-
-      // selectボタン
-      const button = document.createElement("button")
-      const selectButton = button.cloneNode(true)
-      selectButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z"/></svg>
-      `
-      selectButton.onclick = (() => findNode(v.id, v.page))
-      li.appendChild(selectButton)
-
-      // editボタン
-      const editButton = button.cloneNode(true)
-      editButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"/></svg>
-      `
-      editButton.onclick = (() => {
-        const item = document.getElementById(`item_${v.id}`)
-        const input = item.querySelector("input")
-        input.readOnly = false
-        input.focus()
-      })
-      li.appendChild(editButton)
+      li.appendChild(div)
 
       // deleteボタン
-      const deleteButton = button.cloneNode(true)
+      const deleteButton = document.createElement("button")
       deleteButton.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
       `
