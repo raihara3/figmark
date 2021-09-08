@@ -48,7 +48,9 @@
     }
 
   li div {
+    overflow: hidden;
     flex-grow: 1;
+    height: 1rem;
     padding: 6px 0 6px 10px;
     font-size: 11px;
     cursor: default;
@@ -115,26 +117,45 @@ onmessage = (event) => {
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
       // TODO: 選択したものにフォーカスをあてる
-      // TODO: 保存名に文字数制限を設ける
+      // TODO: リファクタ
       // TODO: 保存名変更時にテキスト全選択する
-      // TODO: プラスアイコンの差し替え
 
       const div = document.createElement("div")
       div.contentEditable = false
       div.innerText = v.name
+
+      let textCount = 0
       div.addEventListener("click", (e) => {
         // コンポーネントを選択
         findNode(v.id, v.page)
       })
       div.addEventListener("dblclick", (e) => {
         // 保存名の変更
+        textCount = div.innerText.length
         div.contentEditable = true
         div.focus()
       })
       div.addEventListener("blur", (e) => {
         // storageを更新
         div.contentEditable = false
+        textCount = e.target.innerText.length
         updateMark(v.id, e.target.innerText)
+      })
+      const MAX_TEXT_LENGTH = 30
+      div.addEventListener("keyup", (e) => {
+        // 改行させない
+        if(e.key === "Enter" && div.innerText.indexOf('\n') !== -1) {
+          div.innerText = div.innerText.replaceAll('\n', '')
+          div.blur()
+          return
+        }
+
+        textCount = e.target.innerText.length
+        // 規定の文字数を超えたらblur
+        if(e.key === "Enter" || e.key === "Backspace") return
+        if(e.target.innerText.length == MAX_TEXT_LENGTH) {
+          div.blur()
+        }
       })
 
       const li = document.createElement("li")
