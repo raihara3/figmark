@@ -39,6 +39,16 @@ figma.ui.onmessage = msg => {
 
     // select component
     const node = figma.getNodeById(msg.id)
+    if(!node) {
+      alert('既に削除されています')
+      figmark = figmark.map(v => {
+        if(v.id !== msg.id) return v
+        return
+      }).filter(v => v !== undefined)
+      figma.clientStorage.setAsync("figmark", figmark)
+      figma.ui.postMessage({ type: "update-figmark", value: figmark })
+      return
+    }
     figma.currentPage.selection = new Array().concat(node)
 
   }else if(msg.type === "delete-bookmark") {
