@@ -15,20 +15,21 @@
   }
 
   header {
+    display: flex;
     background: #2C2C2C;
   }
 
-  .add-button {
+  .header-button {
     display: flex;
     align-items: center;
-    padding: 4px;
-    color: #FFFFFF;
+    padding: 6px;
   }
-    .add-button:hover {
+    .header-button:hover {
       background: #000000;
     }
-    .add-button svg {
-      fill: #FFFFFF;
+    .header-button svg {
+      width: 18px;
+      height: 18px;
     }
 
   ul {
@@ -64,15 +65,18 @@
       display: inline-block;
     }
     li button svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       fill: #2F2F2F;
     }
 </style>
 
 <header>
-  <button id="add-button" class="add-button">
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+  <button id="add-button" class="add-button header-button">
+    <svg width="32" height="31" viewBox="0 0 32 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.15076 15.5H30.8492" stroke="white"/>
+      <path d="M16 30.3492L16 0.650759" stroke="white"/>
+    </svg>
   </button>
 </header>
 <ul id="figmark-list"></ul>
@@ -91,10 +95,7 @@ const findNode = (id, page) => {
 
 // ブックマークから削除
 const deleteMark = (id) => {
-  const result = confirm("削除していいですか？");
-  if(result) {
-    parent.postMessage({ pluginMessage: { type: "delete-bookmark", id: id } }, "*")
-  }
+  parent.postMessage({ pluginMessage: { type: "delete-bookmark", id: id } }, "*")
 }
 
 // ブックマーク情報の更新
@@ -115,7 +116,6 @@ onmessage = (event) => {
     data.value.forEach(v => {
       // TODO: 選択したものにフォーカスをあてる
       // TODO: 保存名に文字数制限を設ける
-      // TODO: 全削除ボタン
       // TODO: 保存名変更時にテキスト全選択する
       // TODO: プラスアイコンの差し替え
 
