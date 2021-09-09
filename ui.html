@@ -18,7 +18,11 @@
   /* ===== header ===== */
 
   .header {
+    position: fixed;
+    top: 0;
+    left: 0;
     display: flex;
+    width: 100%;
     background: #2C2C2C;
   }
 
@@ -39,7 +43,7 @@
 
   .figmark-list {
     margin: auto;
-    padding: 0;
+    padding: 30px 0 0;
   }
 
   .figmark-list li {
@@ -97,8 +101,6 @@ const onPostMessage = (type, value) => {
 }
 
 /* ===== create bookmarak list ===== */
-
-// TODO: 追加済み、削除済みのポップアップ表示
 
 const MAX_TEXT_LENGTH = 30
 

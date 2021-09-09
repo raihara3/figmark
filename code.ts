@@ -53,7 +53,7 @@ figma.ui.onmessage = msg => {
       figma.currentPage.selection = new Array().concat(node)
       return
     }
-    alert('既に削除されています')
+    figma.notify("It's already been removed.")
     deleteItem(id)
     updateFigmark()
 
