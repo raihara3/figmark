@@ -1,15 +1,25 @@
 let figmark = [];
+/* ===== main ===== */
+const updateFigmark = () => {
+    figma.clientStorage.setAsync("figmark", figmark);
+    figma.ui.postMessage({ type: "update-figmark", value: figmark });
+};
+const deleteItem = (id) => {
+    figmark = figmark.map(v => {
+        if (v.id !== id)
+            return v;
+        return;
+    }).filter(v => v !== undefined);
+};
 figma.showUI(__html__);
 figma.ui.onmessage = msg => {
     if (msg.type === "add-bookmark") {
         const selections = figma.currentPage.selection;
-        // 選択されているコンポーネントがない
         if (selections.length === 0)
             return;
         selections.forEach(select => {
-            const isSaved = figmark.map(v => v.id).filter(id => id === select.id);
-            // 既に保存されている
-            if (isSaved.length > 0)
+            const hasSaved = figmark.map(v => v.id).filter(id => id === select.id).length;
+            if (hasSaved)
                 return;
             figmark.push({
                 id: select.id,
@@ -17,58 +27,46 @@ figma.ui.onmessage = msg => {
                 name: select.name
             });
         });
-        figma.clientStorage.setAsync("figmark", figmark);
-        figma.ui.postMessage({ type: "update-figmark", value: figmark });
+        updateFigmark();
     }
     else if (msg.type === "select-node") {
-        const value = msg.value;
+        const { id, page } = msg.value;
         // select page
-        if (figma.currentPage.id !== value.page) {
-            const targetPage = figma.root.findChild(v => v.id === value.page);
+        if (figma.currentPage.id !== page) {
+            const targetPage = figma.root.findChild(v => v.id === page);
             figma.currentPage = targetPage;
         }
         // select component
-        const node = figma.getNodeById(value.id);
-        if (!node) {
-            alert('既に削除されています');
-            figmark = figmark.map(v => {
-                if (v.id !== value.id)
-                    return v;
-                return;
-            }).filter(v => v !== undefined);
-            figma.clientStorage.setAsync("figmark", figmark);
-            figma.ui.postMessage({ type: "update-figmark", value: figmark });
+        const node = figma.getNodeById(id);
+        if (node) {
+            figma.currentPage.selection = new Array().concat(node);
             return;
         }
-        figma.currentPage.selection = new Array().concat(node);
+        alert('既に削除されています');
+        deleteItem(id);
+        updateFigmark();
     }
     else if (msg.type === "delete-bookmark") {
-        const value = msg.value;
-        figmark = figmark.map(v => {
-            if (v.id !== value.id)
-                return v;
-            return;
-        }).filter(v => v !== undefined);
-        figma.clientStorage.setAsync("figmark", figmark);
-        figma.ui.postMessage({ type: "update-figmark", value: figmark });
+        const { id } = msg.value;
+        deleteItem(id);
+        updateFigmark();
     }
     else if (msg.type === "update-bookmark") {
-        const value = msg.value;
+        const { id, name } = msg.value;
         figmark = figmark.map(v => {
-            if (v.id === value.id) {
+            if (v.id === id) {
                 return {
                     id: v.id,
                     page: v.page,
-                    name: value.name
+                    name: name
                 };
             }
             return v;
         });
-        figma.clientStorage.setAsync("figmark", figmark);
-        figma.ui.postMessage({ type: "update-figmark", value: figmark });
+        updateFigmark();
     }
 };
-figma.clientStorage.getAsync("figmark").then(value => {
+figma.clientStorage.getAsync("figmark").then((value) => {
     if (value !== undefined) {
         figmark = value;
     }
