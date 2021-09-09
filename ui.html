@@ -79,7 +79,7 @@
 </style>
 
 <header class="header">
-  <button id="add-button" class="header-button">
+  <button id="add-button" class="header-button" onclick="onPostMessage('add-bookmark')">
     <svg width="32" height="31" viewBox="0 0 32 31" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M1.15076 15.5H30.8492" stroke="white"/>
       <path d="M16 30.3492L16 0.650759" stroke="white"/>
@@ -90,51 +90,45 @@
 
 <script>
 
-// ブックマークの追加
-document.getElementById("add-button").onclick = () => {
-  parent.postMessage({ pluginMessage: { type: "add-bookmark" } }, "*")
+/* ===== post message ===== */
+
+const onPostMessage = (type, value) => {
+  parent.postMessage({ pluginMessage: { type, value } }, "*")
 }
 
-// ブックマークしたコンポーネントを選択
-const findNode = (id, page) => {
-  parent.postMessage({ pluginMessage: { type: "select-node", id: id, page: page } }, "*")
-}
+/* ===== create bookmarak list ===== */
 
-// ブックマークから削除
-const deleteMark = (id) => {
-  parent.postMessage({ pluginMessage: { type: "delete-bookmark", id: id } }, "*")
-}
+// TODO: 追加済み、削除済みのポップアップ表示
 
-// ブックマーク情報の更新
-const updateMark = (id, value) => {
-  parent.postMessage({ pluginMessage: { type: "update-bookmark", id: id, value: value} }, "*")
-}
+const MAX_TEXT_LENGTH = 30
 
+const listWrapper = document.getElementById("figmark-list")
 
-/* =====================================
-  ここからDOMとイベントの生成
-===================================== */
+// elements
+const e_div = document.createElement("div")
+const e_li = document.createElement("li")
+const e_button = document.createElement("button")
+e_button.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
+  `
 
 onmessage = (event) => {
   const data = event.data.pluginMessage
+
   if(data.type === "update-figmark") {
-    const listWrapper = document.getElementById("figmark-list")
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
-      // TODO: 選択したものにフォーカスをあてる
-      // TODO: リファクタ
+      const li = e_li.cloneNode(true)
 
-      const div = document.createElement("div")
-      div.contentEditable = false
+      const div = e_div.cloneNode(true)
       div.innerText = v.name
 
       let textCount = 0
       div.addEventListener("click", (e) => {
-        // コンポーネントを選択
-        findNode(v.id, v.page)
+        onPostMessage("select-node", {id: v.id, page: v.page})
       })
       div.addEventListener("dblclick", (e) => {
-        // 保存名の変更
+        // change the name
         textCount = div.innerText.length
         div.contentEditable = true
         div.focus()
@@ -143,38 +137,30 @@ onmessage = (event) => {
         document.execCommand('selectAll', false, null)
       })
       div.addEventListener("blur", (e) => {
-        // storageを更新
+        // update bookmark
         div.contentEditable = false
         textCount = e.target.innerText.length
-        updateMark(v.id, e.target.innerText)
+        onPostMessage("update-bookmark", {id: v.id, name: e.target.innerText})
       })
-      const MAX_TEXT_LENGTH = 30
       div.addEventListener("keyup", (e) => {
-        // 改行させない
         if(e.key === "Enter" && div.innerText.indexOf('\n') !== -1) {
+          // no line breaks
           div.innerText = div.innerText.replaceAll('\n', '')
           div.blur()
           return
         }
-
         textCount = e.target.innerText.length
-        // 規定の文字数を超えたらblur
         if(e.key === "Enter" || e.key === "Backspace") return
         if(e.target.innerText.length == MAX_TEXT_LENGTH) {
           div.blur()
         }
       })
-
-      const li = document.createElement("li")
-      li.id = `item_${v.id}`
       li.appendChild(div)
 
-      // deleteボタン
-      const deleteButton = document.createElement("button")
-      deleteButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
-      `
-      deleteButton.onclick = (() => deleteMark(v.id))
+      const deleteButton = e_button.cloneNode(true)
+      deleteButton.onclick = (() => {
+        onPostMessage("delete-bookmark", {id: v.id})
+      })
       li.appendChild(deleteButton)
 
       listWrapper.appendChild(li)

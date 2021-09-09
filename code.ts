@@ -4,6 +4,20 @@ interface FigmarkStorage {
   name: string
 }
 
+interface SelectNode {
+  id: string
+  page: string
+}
+
+interface DeleteNode {
+  id: string
+}
+
+interface UpdateBookmark {
+  id: string
+  name: string
+}
+
 let figmark: FigmarkStorage[] = []
 
 figma.showUI(__html__)
@@ -31,18 +45,19 @@ figma.ui.onmessage = msg => {
     figma.ui.postMessage({ type: "update-figmark", value: figmark })
 
   }else if(msg.type === "select-node") {
+    const value: SelectNode = msg.value
     // select page
-    if(figma.currentPage.id !== msg.page) {
-      const targetPage = figma.root.findChild(v => v.id === msg.page)
+    if(figma.currentPage.id !== value.page) {
+      const targetPage = figma.root.findChild(v => v.id === value.page)
       figma.currentPage = targetPage
     }
 
     // select component
-    const node = figma.getNodeById(msg.id)
+    const node = figma.getNodeById(value.id)
     if(!node) {
       alert('既に削除されています')
       figmark = figmark.map(v => {
-        if(v.id !== msg.id) return v
+        if(v.id !== value.id) return v
         return
       }).filter(v => v !== undefined)
       figma.clientStorage.setAsync("figmark", figmark)
@@ -52,20 +67,22 @@ figma.ui.onmessage = msg => {
     figma.currentPage.selection = new Array().concat(node)
 
   }else if(msg.type === "delete-bookmark") {
+    const value: DeleteNode = msg.value
     figmark = figmark.map(v => {
-      if(v.id !== msg.id) return v
+      if(v.id !== value.id) return v
       return
     }).filter(v => v !== undefined)
     figma.clientStorage.setAsync("figmark", figmark)
     figma.ui.postMessage({ type: "update-figmark", value: figmark })
 
   }else if(msg.type === "update-bookmark") {
+    const value: UpdateBookmark = msg.value
     figmark = figmark.map(v => {
-      if(v.id === msg.id) {
+      if(v.id === value.id) {
         return {
           id: v.id,
           page: v.page,
-          name: msg.value
+          name: value.name
         }
       }
       return v

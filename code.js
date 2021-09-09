@@ -21,17 +21,18 @@ figma.ui.onmessage = msg => {
         figma.ui.postMessage({ type: "update-figmark", value: figmark });
     }
     else if (msg.type === "select-node") {
+        const value = msg.value;
         // select page
-        if (figma.currentPage.id !== msg.page) {
-            const targetPage = figma.root.findChild(v => v.id === msg.page);
+        if (figma.currentPage.id !== value.page) {
+            const targetPage = figma.root.findChild(v => v.id === value.page);
             figma.currentPage = targetPage;
         }
         // select component
-        const node = figma.getNodeById(msg.id);
+        const node = figma.getNodeById(value.id);
         if (!node) {
             alert('既に削除されています');
             figmark = figmark.map(v => {
-                if (v.id !== msg.id)
+                if (v.id !== value.id)
                     return v;
                 return;
             }).filter(v => v !== undefined);
@@ -42,8 +43,9 @@ figma.ui.onmessage = msg => {
         figma.currentPage.selection = new Array().concat(node);
     }
     else if (msg.type === "delete-bookmark") {
+        const value = msg.value;
         figmark = figmark.map(v => {
-            if (v.id !== msg.id)
+            if (v.id !== value.id)
                 return v;
             return;
         }).filter(v => v !== undefined);
@@ -51,12 +53,13 @@ figma.ui.onmessage = msg => {
         figma.ui.postMessage({ type: "update-figmark", value: figmark });
     }
     else if (msg.type === "update-bookmark") {
+        const value = msg.value;
         figmark = figmark.map(v => {
-            if (v.id === msg.id) {
+            if (v.id === value.id) {
                 return {
                     id: v.id,
                     page: v.page,
-                    name: msg.value
+                    name: value.name
                 };
             }
             return v;
