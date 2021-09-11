@@ -1,7 +1,8 @@
 {
   "name": "figmark",
-  "id": "989875134948533173",
+  "id": "1018556921170761713",
   "api": "1.0.0",
   "main": "code.js",
-  "ui": "ui.html"
+  "ui": "ui.html",
+  "editorType": ["figma"]
 }
