@@ -1,7 +1,8 @@
 let figmark = [];
+const PROJECT_NAME = figma.root.name;
 /* ===== main ===== */
 const updateFigmark = () => {
-    figma.clientStorage.setAsync("figmark", figmark);
+    figma.clientStorage.setAsync(`figmark_${PROJECT_NAME}`, figmark);
     figma.ui.postMessage({ type: "update-figmark", value: figmark });
 };
 const deleteItem = (id) => {
@@ -66,7 +67,7 @@ figma.ui.onmessage = msg => {
         updateFigmark();
     }
 };
-figma.clientStorage.getAsync("figmark").then((value) => {
+figma.clientStorage.getAsync(`figmark_${PROJECT_NAME}`).then((value) => {
     if (value !== undefined) {
         figmark = value;
     }

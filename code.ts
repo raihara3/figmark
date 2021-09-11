@@ -6,10 +6,12 @@ interface FigmarkStorage {
 
 let figmark: FigmarkStorage[] = []
 
+const PROJECT_NAME = figma.root.name
+
 /* ===== main ===== */
 
 const updateFigmark = () => {
-  figma.clientStorage.setAsync("figmark", figmark)
+  figma.clientStorage.setAsync(`figmark_${PROJECT_NAME}`, figmark)
   figma.ui.postMessage({ type: "update-figmark", value: figmark })
 }
 
@@ -78,7 +80,7 @@ figma.ui.onmessage = msg => {
   }
 }
 
-figma.clientStorage.getAsync("figmark").then((value: FigmarkStorage[] | undefined) => {
+figma.clientStorage.getAsync(`figmark_${PROJECT_NAME}`).then((value: FigmarkStorage[] | undefined) => {
   if (value !== undefined) {
     figmark = value
   }
