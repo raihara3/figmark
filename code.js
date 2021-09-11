@@ -16,8 +16,10 @@ figma.showUI(__html__);
 figma.ui.onmessage = msg => {
     if (msg.type === "add-bookmark") {
         const selections = figma.currentPage.selection;
-        if (selections.length === 0)
+        if (selections.length === 0) {
+            figma.notify("Select the one you want to add.");
             return;
+        }
         selections.forEach(select => {
             const hasSaved = figmark.map(v => v.id).filter(id => id === select.id).length;
             if (hasSaved)
@@ -49,6 +51,7 @@ figma.ui.onmessage = msg => {
     }
     else if (msg.type === "delete-bookmark") {
         const { id } = msg.value;
+        figma.notify("removed.");
         deleteItem(id);
         updateFigmark();
     }
