@@ -1,3 +1,5 @@
+plugin: [figmark](https://www.figma.com/community/plugin/1018556921170761713/figmark)
+
 This is a Figma's plugin that allows you to bookmark your favorite objects.
 You can bookmark components you see frequently and find them quickly.
 
