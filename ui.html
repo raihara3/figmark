@@ -50,6 +50,7 @@
     display: flex;
     align-items: center;
     padding: 2px 0 2px;
+    background-color: #FFFFFF;
   }
     .figmark-list li:hover {
       outline: 1px solid #00A1FF;
@@ -109,6 +110,7 @@ const listWrapper = document.getElementById("figmark-list")
 // elements
 const e_div = document.createElement("div")
 const e_li = document.createElement("li")
+e_li.setAttribute("draggable", "true")
 const e_button = document.createElement("button")
 e_button.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
@@ -121,6 +123,7 @@ onmessage = (event) => {
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
       const li = e_li.cloneNode(true)
+      li.id = v.id
 
       const div = e_div.cloneNode(true)
       div.innerText = v.name
@@ -166,6 +169,46 @@ onmessage = (event) => {
       li.appendChild(deleteButton)
 
       listWrapper.appendChild(li)
+    });
+
+    let dragId = ""
+    document.querySelectorAll('.figmark-list li').forEach (elm => {
+      elm.ondragstart = function () {
+        dragId = elm.id
+      };
+      elm.ondragover = function (event) {
+        event.preventDefault();
+        let rect = this.getBoundingClientRect();
+        if ((event.clientY - rect.top) < (this.clientHeight / 2)) {
+          //マウスカーソルの位置が要素の半分より上
+          this.style.borderTop = '2px solid black';
+          this.style.borderBottom = '';
+        } else {
+          //マウスカーソルの位置が要素の半分より下
+          this.style.borderTop = '';
+          this.style.borderBottom = '2px solid black';
+        }
+      };
+      elm.ondragleave = function () {
+        this.style.borderTop = '';
+        this.style.borderBottom = '';
+      };
+      elm.ondrop = function (event) {
+        event.preventDefault();
+        let elm_drag = document.getElementById(dragId);
+
+        let rect = this.getBoundingClientRect();
+        if ((event.clientY - rect.top) < (this.clientHeight / 2)) {
+          //マウスカーソルの位置が要素の半分より上
+          this.parentNode.insertBefore(elm_drag, this);
+        } else {
+          //マウスカーソルの位置が要素の半分より下
+          this.parentNode.insertBefore(elm_drag, this.nextSibling);
+        }
+        this.style.borderTop = '';
+        this.style.borderBottom = '';
+        dragId = '';
+      };
     });
   }
 }
