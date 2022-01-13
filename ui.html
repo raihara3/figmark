@@ -52,6 +52,9 @@
     padding: 2px 0 2px;
     background-color: #FFFFFF;
   }
+    .figmark-list li.selected {
+      background-color: #DAEBF7;
+    }
     .figmark-list li:hover {
       outline: 1px solid #00A1FF;
       outline-offset: -1px;
@@ -116,6 +119,22 @@ e_button.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
   `
 
+document.addEventListener("keydown", (e) => {
+  if(e.key === "ArrowDown") {
+    const selected = document.querySelector(".selected")
+    if(!selected.nextElementSibling) return
+    selected.classList.remove("selected")
+    selected.nextElementSibling.classList.add("selected")
+    selected.nextElementSibling.getElementsByTagName("div")[0].click()
+  }else if(e.key === "ArrowUp") {
+    const selected = document.querySelector(".selected")
+    if(!selected.previousElementSibling) return
+    selected.classList.remove("selected")
+    selected.previousElementSibling.classList.add("selected")
+    selected.previousElementSibling.getElementsByTagName("div")[0].click()
+  }
+})
+
 onmessage = (event) => {
   const data = event.data.pluginMessage
 
@@ -130,6 +149,8 @@ onmessage = (event) => {
 
       let textCount = 0
       div.addEventListener("click", (e) => {
+        document.querySelector(".selected")?.classList.remove("selected")
+        li.classList.add("selected")
         onPostMessage("select-node", {id: v.id, page: v.page})
       })
       div.addEventListener("dblclick", (e) => {
