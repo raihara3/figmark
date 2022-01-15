@@ -25,7 +25,14 @@ const deleteItem = (id) => {
 figma.showUI(__html__)
 
 figma.ui.onmessage = msg => {
-  if(msg.type === "add-bookmark") {
+  if(msg.type === "get-figmark") {
+    figma.clientStorage.getAsync(`figmark_${PROJECT_NAME}`).then((value: FigmarkStorage[] | undefined) => {
+      if (value !== undefined) {
+        figmark = value
+      }
+      figma.ui.postMessage({ type: "update-figmark", value: figmark })
+    })
+  }else if(msg.type === "add-bookmark") {
     const selections = figma.currentPage.selection
     if(selections.length === 0) {
       figma.notify("Select the one you want to add.")
@@ -83,10 +90,3 @@ figma.ui.onmessage = msg => {
     updateFigmark()
   }
 }
-
-figma.clientStorage.getAsync(`figmark_${PROJECT_NAME}`).then((value: FigmarkStorage[] | undefined) => {
-  if (value !== undefined) {
-    figmark = value
-  }
-  figma.ui.postMessage({ type: "update-figmark", value: figmark })
-})
