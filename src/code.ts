@@ -1,17 +1,23 @@
+import ClientStorage from "./storage/ClientStorage"
+
+// types
 interface FigmarkStorage {
   id: string
   page: string
   name: string
 }
 
-let figmark: FigmarkStorage[] = []
-
+// constant
 const PROJECT_NAME = figma.root.name
 
-/* ===== main ===== */
+// global variables
+let figmark: FigmarkStorage[] = []
 
+const clientStorage = new ClientStorage(PROJECT_NAME)
+
+/* ===== main ===== */
 const updateFigmark = () => {
-  figma.clientStorage.setAsync(`figmark_${PROJECT_NAME}`, figmark)
+  clientStorage.set(figmark)
   figma.ui.postMessage({ type: "update-figmark", value: figmark })
 }
 
@@ -26,7 +32,7 @@ figma.showUI(__html__)
 
 figma.ui.onmessage = msg => {
   if(msg.type === "get-figmark") {
-    figma.clientStorage.getAsync(`figmark_${PROJECT_NAME}`).then((value: FigmarkStorage[] | undefined) => {
+    clientStorage.get().then((value: FigmarkStorage[] | undefined) => {
       if (value !== undefined) {
         figmark = value
       }
