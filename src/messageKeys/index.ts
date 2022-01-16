@@ -1,0 +1,5 @@
+export const GET_FIGMARK = "get-figmark"
+export const ADD_FIGMARK = "add-figmark"
+export const UPDATE_FIGMARK = "update-figmark"
+export const DELETE_FIGMARK = "delete-figmark"
+export const SELECT_FIGMARK = "select-figmark"

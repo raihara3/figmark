@@ -1,4 +1,11 @@
 import "./ui.css"
+import {
+  GET_FIGMARK,
+  ADD_FIGMARK,
+  UPDATE_FIGMARK,
+  DELETE_FIGMARK,
+  SELECT_FIGMARK,
+} from "./messageKeys/index"
 
 /* ===== post message ===== */
 
@@ -13,7 +20,7 @@ let listWrapper, e_div, e_li, e_button
 
 window.addEventListener("load", () => {
   document.getElementById("add-button").addEventListener("click", () => {
-    parent.postMessage({ pluginMessage: { type: "add-bookmark"} }, "*")
+    parent.postMessage({ pluginMessage: { type: ADD_FIGMARK} }, "*")
   })
 
   listWrapper = document.getElementById("figmark-list")
@@ -43,14 +50,14 @@ window.addEventListener("load", () => {
     }
   })
 
-  parent.postMessage({ pluginMessage: { type: "get-figmark" }}, "*")
+  parent.postMessage({ pluginMessage: { type: GET_FIGMARK }}, "*")
 })
 
 onmessage = (event) => {
   console.log(event)
   const data = event.data.pluginMessage
 
-  if(data.type === "update-figmark") {
+  if(data.type === UPDATE_FIGMARK) {
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
       const li = e_li.cloneNode(true)
@@ -65,7 +72,7 @@ onmessage = (event) => {
         li.classList.add("selected")
         // onPostMessage("select-node", {id: v.id, page: v.page})
         parent.postMessage({ pluginMessage: {
-          type: "select-node",
+          type: SELECT_FIGMARK,
           value: {
             id: v.id,
             page: v.page
@@ -87,7 +94,7 @@ onmessage = (event) => {
         textCount = e.target.innerText.length
         // onPostMessage("update-bookmark", {id: v.id, name: e.target.innerText})
         parent.postMessage({ pluginMessage: {
-          type: "update-bookmark",
+          type: UPDATE_FIGMARK,
           value: {
             id: v.id,
             name: e.target.innerText
@@ -113,7 +120,7 @@ onmessage = (event) => {
       deleteButton.onclick = (() => {
         // onPostMessage("delete-bookmark", {id: v.id})
         parent.postMessage({ pluginMessage: {
-          type: "delete-bookmark",
+          type: DELETE_FIGMARK,
           value: {
             id: v.id
           }
