@@ -7,16 +7,17 @@ import {
   SELECT_FIGMARK,
 } from "./messageKeys/index"
 
-/* ===== post message ===== */
-
-// function onPostMessage(type, value) {
-//   parent.postMessage({ pluginMessage: { type, value } }, "*")
-// }
-
-/* ===== create bookmarak list ===== */
-
+// constant
 const MAX_TEXT_LENGTH = 30
-let listWrapper, e_div, e_li, e_button
+
+// global variables
+let listWrapper
+const base_li = document.createElement("li")
+base_li.setAttribute("draggable", "true")
+const base_trash_button = document.createElement("button")
+base_trash_button.innerHTML = `
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
+`
 
 window.addEventListener("load", () => {
   document.getElementById("add-button").addEventListener("click", () => {
@@ -24,15 +25,6 @@ window.addEventListener("load", () => {
   })
 
   listWrapper = document.getElementById("figmark-list")
-
-  // elements
-  e_div = document.createElement("div")
-  e_li = document.createElement("li")
-  e_li.setAttribute("draggable", "true")
-  e_button = document.createElement("button")
-  e_button.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
-    `
 
   document.addEventListener("keydown", (e) => {
     if(e.key === "ArrowDown") {
@@ -54,23 +46,22 @@ window.addEventListener("load", () => {
 })
 
 onmessage = (event) => {
-  console.log(event)
   const data = event.data.pluginMessage
 
   if(data.type === UPDATE_FIGMARK) {
     listWrapper.innerHTML = ""
     data.value.forEach(v => {
-      const li = e_li.cloneNode(true)
+      const li = base_li.cloneNode(true) as HTMLLIElement
       li.id = v.id
 
-      const div = e_div.cloneNode(true)
+      const div = document.createElement("div")
       div.innerText = v.name
 
       let textCount = 0
       div.addEventListener("click", (e) => {
+        // select figmark
         document.querySelector(".selected")?.classList.remove("selected")
         li.classList.add("selected")
-        // onPostMessage("select-node", {id: v.id, page: v.page})
         parent.postMessage({ pluginMessage: {
           type: SELECT_FIGMARK,
           value: {
@@ -82,17 +73,16 @@ onmessage = (event) => {
       div.addEventListener("dblclick", (e) => {
         // change the name
         textCount = div.innerText.length
-        div.contentEditable = true
+        div.contentEditable = "true"
         div.focus()
       })
       div.addEventListener("focus", () => {
         document.execCommand('selectAll', false, null)
       })
-      div.addEventListener("blur", (e) => {
-        // update bookmark
-        div.contentEditable = false
+      div.addEventListener("blur", (e: any) => {
+        // update figmark
+        div.contentEditable = "false"
         textCount = e.target.innerText.length
-        // onPostMessage("update-bookmark", {id: v.id, name: e.target.innerText})
         parent.postMessage({ pluginMessage: {
           type: UPDATE_FIGMARK,
           value: {
@@ -101,7 +91,7 @@ onmessage = (event) => {
           }
         } }, "*")
       })
-      div.addEventListener("keyup", (e) => {
+      div.addEventListener("keyup", (e: any) => {
         if(e.key === "Enter" && div.innerText.indexOf('\n') !== -1) {
           // no line breaks
           div.innerText = div.innerText.replaceAll('\n', '')
@@ -116,9 +106,8 @@ onmessage = (event) => {
       })
       li.appendChild(div)
 
-      const deleteButton = e_button.cloneNode(true)
+      const deleteButton = base_trash_button.cloneNode(true) as HTMLButtonElement
       deleteButton.onclick = (() => {
-        // onPostMessage("delete-bookmark", {id: v.id})
         parent.postMessage({ pluginMessage: {
           type: DELETE_FIGMARK,
           value: {
